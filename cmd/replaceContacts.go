@@ -24,12 +24,15 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/buger/jsonparser"
+	mailingList "github.com/jftuga/quautomatrics/mailinglist"
 	"github.com/jftuga/quautomatrics/rest"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 )
 
-var mailingList, csvFile string
+var mailingListName, csvFile string
 
 // replaceContactsCmd represents the replaceContacts command
 var replaceContactsCmd = &cobra.Command{
@@ -48,18 +51,63 @@ first name, last name, email address`,
 
 func init() {
 	rootCmd.AddCommand(replaceContactsCmd)
-	replaceContactsCmd.Flags().StringVarP(&mailingList, "mailingList","m", "", "name of qualtrics mailing list")
+	replaceContactsCmd.Flags().StringVarP(&mailingListName, "mailingList", "m", "", "name of qualtrics mailing list")
 	replaceContactsCmd.MarkFlagRequired("mailingList")
-	replaceContactsCmd.Flags().StringVarP(&csvFile, "csvFile","c", "", "csv filename; format: first,last,email")
+	replaceContactsCmd.Flags().StringVarP(&csvFile, "csvFile", "c", "", "csv filename; format: first,last,email")
 	replaceContactsCmd.MarkFlagRequired("csvFile")
 }
 
 func replaceContacts(args []string) {
-	fmt.Println(mailingList)
-	fmt.Println(csvFile)
-	fmt.Println(viper.Get("X-API-TOKEN"))
-	conn := rest.New(viper.GetString("X-API-TOKEN"),viper.GetString("DATACENTER"))
+	//fmt.Println(mailingListName)
+	//fmt.Println(csvFile)
+	//fmt.Println(viper.Get("X-API-TOKEN"))
+	conn := rest.New(viper.GetString("X-API-TOKEN"), viper.GetString("DATACENTER"))
 	allMailingLists := conn.Get("mailinglists?offset=0")
 	fmt.Println(allMailingLists)
-	fmt.Println("is valid JSON:", json.Valid([]byte(allMailingLists)))
+	if json.Valid([]byte(allMailingLists)) != true {
+		log.Fatalf("Invalid JSON returned from API:\n%s\n", allMailingLists)
+		return
+	}
+	result, _, _, err := jsonparser.Get([]byte(allMailingLists), "result")
+	if err != nil {
+		log.Fatalf("Error #46237: parsing JSON for key='result'\n%s\n", result)
+	}
+	temp := string(result)
+	fmt.Println("temp:", temp)
+	hasList := false
+	var name, id string
+	_, err = jsonparser.ArrayEach(result, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		name, err = jsonparser.GetString(value, "name")
+		if err != nil {
+			log.Fatalf("Error #46885: parsing JSON for key='name'\n%s\n", value)
+		}
+		if name == mailingListName {
+			hasList = true
+			id, err = jsonparser.GetString(value, "id")
+			if err != nil {
+				log.Fatalf("Error #46005: parsing JSON for key='id'\n%s\n", value)
+			}
+			return
+		}
+	}, "elements")
+	if err != nil {
+		log.Fatalf("Error #38932: %s", err)
+	}
+
+	if hasList == false {
+		log.Fatalf("Error #46376: mailing list does not exist: %s\n", mailingListName)
+	}
+
+	//fmt.Println("id:", id)
+	mList := mailingList.New(mailingListName, id)
+	allContacts := mList.GetAllContacts()
+	for _, contact := range allContacts {
+		fmt.Println(contact.Email)
+		success := mList.DeleteContact(contact.Id)
+		fmt.Println("delete success:", success)
+		fmt.Println()
+	}
+
+	//part 2 - import from csv
+
 }
