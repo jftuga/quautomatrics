@@ -1,6 +1,7 @@
 package mailingList
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/buger/jsonparser"
 	"github.com/jftuga/quautomatrics/rest"
@@ -35,7 +36,11 @@ func extractItem(value []byte, key string) string {
 	return item
 }
 
-func New(name, id string) *MailingList {
+func New(name string) *MailingList {
+	id := getMailingListID(name)
+	if len(id) == 0 {
+		log.Fatalf("Error #58025: Mailing list not found: %s\n", name)
+	}
 	token := viper.GetString("X-API-TOKEN")
 	dc := viper.GetString("DATACENTER")
 	r := rest.New(token, dc)
@@ -44,6 +49,51 @@ func New(name, id string) *MailingList {
 		Name: name,
 		Conn: Connection{token, dc, *r},
 	}
+}
+
+func getMailingListID(mailingListName string) string {
+	token := viper.GetString("X-API-TOKEN")
+	dc := viper.GetString("DATACENTER")
+	r := rest.New(token, dc)
+	path := "mailinglists?offset=0"
+	allMailingLists := r.Get(path)
+
+	// validate JSON returned from API
+	if json.Valid([]byte(allMailingLists)) != true {
+		log.Fatalf("Error #45873: Invalid JSON returned from API:\n%s\n", allMailingLists)
+	}
+
+	result, _, _, err := jsonparser.Get([]byte(allMailingLists), "result")
+	if err != nil {
+		log.Fatalf("Error #46237: parsing JSON for key='result'\n%s\n", result)
+	}
+
+	// iterate through all mailing list entries and search for 'mailingListName'
+	hasList := false
+	var name, id string
+	_, err = jsonparser.ArrayEach(result, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		name, err = jsonparser.GetString(value, "name")
+		if err != nil {
+			log.Fatalf("Error #46885: parsing JSON for key='name'\n%s\n", value)
+		}
+		if name == mailingListName { // mailing list is found, get its 'id'
+			hasList = true
+			id, err = jsonparser.GetString(value, "id")
+			if err != nil {
+				log.Fatalf("Error #46005: parsing JSON for key='id'\n%s\n", value)
+			}
+			return
+		}
+	}, "elements")
+	if err != nil {
+		log.Fatalf("Error #38932: %s", err)
+	}
+
+	if hasList == false {
+		log.Printf("Warning #46376: mailing list does not exist: %s\n", mailingListName)
+		return ""
+	}
+	return id
 }
 
 func (mList MailingList) GetAllContacts() []Contact {

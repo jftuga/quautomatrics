@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"bytes"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -26,7 +27,7 @@ func (rest Rest) Action(verb, path string) string {
 	url := rest.BaseURL + path
 	req, err := http.NewRequest(verb, url, nil)
 	if err != nil {
-		log.Fatalf("%s:%s", path, err)
+		log.Fatalf("Error #32043: %s:%s", path, err)
 		return ""
 	}
 	req.Header.Add("X-API-TOKEN", rest.token)
@@ -45,4 +46,22 @@ func (rest Rest) Get(path string) string {
 
 func (rest Rest) Delete(path string) string {
 	return rest.Action("DELETE", path)
+}
+
+func (rest Rest) Post(path string, jsonData []byte) string {
+	url := rest.BaseURL + path
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Fatalf("Error #32347: %s:%s", path, err)
+		return ""
+	}
+	req.Header.Add("X-API-TOKEN", rest.token)
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Error #59411: error on response.\n[ERR] -", err)
+	}
+	body, _ := ioutil.ReadAll(resp.Body)
+	return string(body)
 }

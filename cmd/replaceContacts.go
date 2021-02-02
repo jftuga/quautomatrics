@@ -22,14 +22,17 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"github.com/buger/jsonparser"
 	mailingList "github.com/jftuga/quautomatrics/mailinglist"
-	"github.com/jftuga/quautomatrics/rest"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"io"
+	"io/ioutil"
 	"log"
+	"os"
 )
 
 var mailingListName, csvFile string
@@ -45,7 +48,7 @@ CSV file format (no header line):
 first name, last name, email address`,
 	Run: func(cmd *cobra.Command, args []string) {
 		//fmt.Println("replaceContacts called")
-		replaceContacts(args)
+		ReplaceContacts()
 	},
 }
 
@@ -57,57 +60,68 @@ func init() {
 	replaceContactsCmd.MarkFlagRequired("csvFile")
 }
 
-func replaceContacts(args []string) {
-	//fmt.Println(mailingListName)
-	//fmt.Println(csvFile)
-	//fmt.Println(viper.Get("X-API-TOKEN"))
-	conn := rest.New(viper.GetString("X-API-TOKEN"), viper.GetString("DATACENTER"))
-	allMailingLists := conn.Get("mailinglists?offset=0")
-	fmt.Println(allMailingLists)
-	if json.Valid([]byte(allMailingLists)) != true {
-		log.Fatalf("Invalid JSON returned from API:\n%s\n", allMailingLists)
-		return
-	}
-	result, _, _, err := jsonparser.Get([]byte(allMailingLists), "result")
-	if err != nil {
-		log.Fatalf("Error #46237: parsing JSON for key='result'\n%s\n", result)
-	}
-	temp := string(result)
-	fmt.Println("temp:", temp)
-	hasList := false
-	var name, id string
-	_, err = jsonparser.ArrayEach(result, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		name, err = jsonparser.GetString(value, "name")
-		if err != nil {
-			log.Fatalf("Error #46885: parsing JSON for key='name'\n%s\n", value)
-		}
-		if name == mailingListName {
-			hasList = true
-			id, err = jsonparser.GetString(value, "id")
-			if err != nil {
-				log.Fatalf("Error #46005: parsing JSON for key='id'\n%s\n", value)
-			}
-			return
-		}
-	}, "elements")
-	if err != nil {
-		log.Fatalf("Error #38932: %s", err)
-	}
+func ReplaceContacts() {
+	mList := mailingList.New(mailingListName)
+	DeleteAllContacts(mList)
+	newContacts := getCSVEntries()
+	CreateContacts(mList, newContacts)
+}
 
-	if hasList == false {
-		log.Fatalf("Error #46376: mailing list does not exist: %s\n", mailingListName)
-	}
-
-	//fmt.Println("id:", id)
-	mList := mailingList.New(mailingListName, id)
+func DeleteAllContacts(mList *mailingList.MailingList) {
 	allContacts := mList.GetAllContacts()
 	for _, contact := range allContacts {
-		fmt.Println(contact.Email)
+		fmt.Println("removing contact:", contact.Email)
 		success := mList.DeleteContact(contact.Id)
 		fmt.Println("delete success:", success)
 		fmt.Println()
 	}
+}
 
-	//part 2 - import from csv
+func CreateContacts(mList *mailingList.MailingList, newContacts []mailingList.Contact) {
+	// we don't need the the 'Id' field from contact
+	type contactSmall struct {
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Email     string `json:"email"`
+	}
 
+	path := fmt.Sprintf("/mailinglists/%s/contacts", mList.Id)
+	for _, contact := range newContacts {
+		jsonData := new(bytes.Buffer)
+		c := contactSmall{contact.FirstName, contact.LastName, contact.Email}
+		fmt.Println("creating contact:", c.Email)
+		err := json.NewEncoder(jsonData).Encode(c)
+		if err != nil {
+			log.Fatalf("Error #47922: unable to encode to JSON: %s\n%s\n", c, err)
+		}
+		buf, _ := ioutil.ReadAll(jsonData)
+		request := mList.Conn.Rest.Post(path, buf)
+		meta, _, _, err := jsonparser.Get([]byte(request), "meta")
+		if err != nil {
+			log.Fatalf("Error #73639: parsing JSON for key='meta'\n%s\n", meta)
+		}
+	}
+}
+
+func getCSVEntries() []mailingList.Contact {
+	file, err := os.Open(csvFile)
+	if err != nil {
+		log.Fatalf("Error #70055: unable to open ")
+	}
+	r := csv.NewReader(file)
+
+	var allCSVEntries []mailingList.Contact
+	line := 0
+	for {
+		line += 1
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("Error #70062: unable to process CSV entry: %s, line: %d\n%s\n", csvFile, line, err)
+		}
+		allCSVEntries = append(allCSVEntries, mailingList.Contact{"", record[2], record[0], record[1]})
+	}
+	return allCSVEntries
 }
