@@ -28,14 +28,7 @@ type Contact struct {
 	LastName  string
 }
 
-func extractItem(value []byte, key string) string {
-	item, err := jsonparser.GetString(value, key)
-	if err != nil {
-		log.Fatalf("Error #80211: unable to get '%s' from:\n%s\n", key, value)
-	}
-	return item
-}
-
+// New - return a MailingList struct containing the name and connection information
 func New(name string) *MailingList {
 	id := getMailingListID(name)
 	if len(id) == 0 {
@@ -51,6 +44,7 @@ func New(name string) *MailingList {
 	}
 }
 
+// getMailingListID - make API call to to get the 'id' of the given mailing list
 func getMailingListID(mailingListName string) string {
 	token := viper.GetString("X-API-TOKEN")
 	dc := viper.GetString("DATACENTER")
@@ -96,6 +90,16 @@ func getMailingListID(mailingListName string) string {
 	return id
 }
 
+// extractItem - return an item from a JSON string when given its key
+func extractItem(value []byte, key string) string {
+	item, err := jsonparser.GetString(value, key)
+	if err != nil {
+		log.Fatalf("Error #80211: unable to get '%s' from:\n%s\n", key, value)
+	}
+	return item
+}
+
+// GetAllContacts - return an array of Contact for the preset mailing list name
 func (mList MailingList) GetAllContacts() []Contact {
 	path := fmt.Sprintf("/mailinglists/%s/contacts", mList.Id)
 	request := mList.Conn.Rest.Get(path)
@@ -124,6 +128,7 @@ func (mList MailingList) GetAllContacts() []Contact {
 	return allContacts
 }
 
+// DeleteContact - use the 'id' field of a Contact to issue and API call to remove it from the preset mailing list
 func (mList MailingList) DeleteContact(contactId string) bool {
 	path := fmt.Sprintf("/mailinglists/%s/contacts/%s", mList.Id, contactId)
 	request := mList.Conn.Rest.Delete(path)

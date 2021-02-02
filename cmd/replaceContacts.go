@@ -60,6 +60,8 @@ func init() {
 	replaceContactsCmd.MarkFlagRequired("csvFile")
 }
 
+// ReplaceContacts - main entry point of this file; delete all current contacts, then create new contacts
+// this requires --mailingList and --csvFile
 func ReplaceContacts() {
 	mList := mailingList.New(mailingListName)
 	DeleteAllContacts(mList)
@@ -67,6 +69,7 @@ func ReplaceContacts() {
 	CreateContacts(mList, newContacts)
 }
 
+// DeleteAllContacts - iterate through all mailing list contacts and delete each one
 func DeleteAllContacts(mList *mailingList.MailingList) {
 	allContacts := mList.GetAllContacts()
 	for _, contact := range allContacts {
@@ -77,6 +80,8 @@ func DeleteAllContacts(mList *mailingList.MailingList) {
 	}
 }
 
+// CreateContacts - create a group of new contacts for this mailing list
+// new contacts are located in the CSV file given on command line
 func CreateContacts(mList *mailingList.MailingList, newContacts []mailingList.Contact) {
 	// we don't need the the 'Id' field from contact
 	type contactSmall struct {
@@ -103,6 +108,7 @@ func CreateContacts(mList *mailingList.MailingList, newContacts []mailingList.Co
 	}
 }
 
+// getCSVEntries - convert a CSV entry into an array of Contact
 func getCSVEntries() []mailingList.Contact {
 	file, err := os.Open(csvFile)
 	if err != nil {

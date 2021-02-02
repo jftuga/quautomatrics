@@ -8,13 +8,12 @@ import (
 	"strings"
 )
 
-// https://stackoverflow.com/a/51453196
-
 type Rest struct {
 	token   string
 	BaseURL string
 }
 
+// New - return a Rest struct containing the API token and API URL
 func New(token, datacenter string) *Rest {
 	url := strings.Replace(DataCenterTemplateURL, "{DATACENTER}", datacenter, -1)
 	return &Rest{
@@ -23,7 +22,8 @@ func New(token, datacenter string) *Rest {
 	}
 }
 
-func (rest Rest) Action(verb, path string) string {
+// action - generic function called by Get and Delete
+func (rest Rest) action(verb, path string) string {
 	url := rest.BaseURL + path
 	req, err := http.NewRequest(verb, url, nil)
 	if err != nil {
@@ -40,14 +40,17 @@ func (rest Rest) Action(verb, path string) string {
 	return string(body)
 }
 
+// Get - execute a Get request to an API end point
 func (rest Rest) Get(path string) string {
-	return rest.Action("GET", path)
+	return rest.action("GET", path)
 }
 
+// Delete - execute a Delete request to an API end point
 func (rest Rest) Delete(path string) string {
-	return rest.Action("DELETE", path)
+	return rest.action("DELETE", path)
 }
 
+// Post - execute a Post request to an API end point
 func (rest Rest) Post(path string, jsonData []byte) string {
 	url := rest.BaseURL + path
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
