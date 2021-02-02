@@ -36,7 +36,7 @@ var replaceContactsCmd = &cobra.Command{
 (2) Import all entries from the CSV file
 
 CSV file format (no header line):
-first name, last name, email address`,
+first name,last name,email address`,
 	Run: func(cmd *cobra.Command, args []string) {
 		//fmt.Println("replaceContacts called")
 		ReplaceContacts()
