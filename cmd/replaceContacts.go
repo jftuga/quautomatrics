@@ -69,19 +69,6 @@ func ReplaceContacts() {
 	CreateContacts(mList, newContacts)
 }
 
-// DeleteAllContacts - iterate through all mailing list contacts and delete each one
-func DeleteAllContacts(mList *mailingList.MailingList) {
-	var allContacts []mailingList.Contact
-	mList.GetAllContacts("", &allContacts) // allContacts will contain the results
-	fmt.Println("len(allContacts):", len(allContacts))
-	for _, contact := range allContacts {
-		fmt.Println("removing contact:", contact.Email)
-		success := mList.DeleteContact(contact.Id)
-		fmt.Println("delete success:", success)
-		fmt.Println()
-	}
-}
-
 // CreateContacts - create a group of new contacts for this mailing list
 // new contacts are located in the CSV file given on command line
 func CreateContacts(mList *mailingList.MailingList, newContacts []mailingList.Contact) {
