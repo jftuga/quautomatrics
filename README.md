@@ -33,17 +33,17 @@ Use "quautomatrics [command] --help" for more information about a command.
 A mailing must already be created through the Qualtrics web interface.
 In the examples below it is called `My_Fancy_Survey`.
 
-*Adding Contacts*
+**Adding Contacts**
 ```shell
 quautomatrics createContacts -m My_Fancy_Survey -c people.csv
 ```
 
-*Removing All Contacts*
+**Removing All Contacts**
 ```shell
 quautomatrics deleteContacts -m My_Fancy_Survey
 ```
 
-*Replace Contacts*
+**Replace Contacts**
 * This will first remove all contacts and then add new contacts from a `CSV` file.
 
 ```shell
