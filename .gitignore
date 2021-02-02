@@ -15,4 +15,5 @@
 # vendor/
 qualtrics_config.json
 *.csv
+*.tab
 m.bat
