@@ -22,17 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"bytes"
-	"encoding/csv"
-	"encoding/json"
-	"fmt"
-	"github.com/buger/jsonparser"
 	mailingList "github.com/jftuga/quautomatrics/mailinglist"
 	"github.com/spf13/cobra"
-	"io"
-	"io/ioutil"
-	"log"
-	"os"
 )
 
 var mailingListName, csvFile string
@@ -69,54 +60,3 @@ func ReplaceContacts() {
 	CreateContacts(mList, newContacts)
 }
 
-// CreateContacts - create a group of new contacts for this mailing list
-// new contacts are located in the CSV file given on command line
-func CreateContacts(mList *mailingList.MailingList, newContacts []mailingList.Contact) {
-	// we don't need the the 'Id' field from contact
-	type contactSmall struct {
-		FirstName string `json:"firstName"`
-		LastName  string `json:"lastName"`
-		Email     string `json:"email"`
-	}
-
-	path := fmt.Sprintf("/mailinglists/%s/contacts", mList.Id)
-	for _, contact := range newContacts {
-		jsonData := new(bytes.Buffer)
-		c := contactSmall{contact.FirstName, contact.LastName, contact.Email}
-		fmt.Println("creating contact:", c.Email)
-		err := json.NewEncoder(jsonData).Encode(c)
-		if err != nil {
-			log.Fatalf("Error #47922: unable to encode to JSON: %s\n%s\n", c, err)
-		}
-		buf, _ := ioutil.ReadAll(jsonData)
-		request := mList.Conn.Rest.Post(path, buf)
-		meta, _, _, err := jsonparser.Get([]byte(request), "meta")
-		if err != nil {
-			log.Fatalf("Error #73639: parsing JSON for key='meta'\n%s\n", meta)
-		}
-	}
-}
-
-// getCSVEntries - convert a CSV entry into an array of Contact
-func getCSVEntries() []mailingList.Contact {
-	file, err := os.Open(csvFile)
-	if err != nil {
-		log.Fatalf("Error #70055: unable to open ")
-	}
-	r := csv.NewReader(file)
-
-	var allCSVEntries []mailingList.Contact
-	line := 0
-	for {
-		line += 1
-		record, err := r.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			log.Fatalf("Error #70062: unable to process CSV entry: %s, line: %d\n%s\n", csvFile, line, err)
-		}
-		allCSVEntries = append(allCSVEntries, mailingList.Contact{"", record[2], record[0], record[1]})
-	}
-	return allCSVEntries
-}
