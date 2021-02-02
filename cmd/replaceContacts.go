@@ -71,7 +71,9 @@ func ReplaceContacts() {
 
 // DeleteAllContacts - iterate through all mailing list contacts and delete each one
 func DeleteAllContacts(mList *mailingList.MailingList) {
-	allContacts := mList.GetAllContacts()
+	var allContacts []mailingList.Contact
+	mList.GetAllContacts("", &allContacts) // allContacts will contain the results
+	fmt.Println("len(allContacts):", len(allContacts))
 	for _, contact := range allContacts {
 		fmt.Println("removing contact:", contact.Email)
 		success := mList.DeleteContact(contact.Id)

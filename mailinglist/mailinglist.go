@@ -7,6 +7,7 @@ import (
 	"github.com/jftuga/quautomatrics/rest"
 	"github.com/spf13/viper"
 	"log"
+	"strings"
 )
 
 type Connection struct {
@@ -100,14 +101,21 @@ func extractItem(value []byte, key string) string {
 }
 
 // GetAllContacts - return an array of Contact for the preset mailing list name
-func (mList MailingList) GetAllContacts() []Contact {
-	path := fmt.Sprintf("/mailinglists/%s/contacts", mList.Id)
+// This is a recursive function as results have to be paginated in order to get all of the contacts
+// allContacts will contain the results
+func (mList MailingList) GetAllContacts(nextPage string, allContacts *[]Contact) {
+	var path string
+	if len(nextPage) == 0 {
+		path = fmt.Sprintf("/mailinglists/%s/contacts", mList.Id)
+	} else {
+		path = fmt.Sprintf("/mailinglists/%s/contacts?skipToken=%s", mList.Id, nextPage)
+	}
 	request := mList.Conn.Rest.Get(path)
 	result, _, _, err := jsonparser.Get([]byte(request), "result")
 	if err != nil {
 		log.Fatalf("Error #73021: parsing JSON for key='result'\n%s\n", result)
 	}
-	var allContacts []Contact
+
 	_, err = jsonparser.ArrayEach(result, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		id := extractItem(value, "id")
 		email := extractItem(value, "email")
@@ -118,14 +126,24 @@ func (mList MailingList) GetAllContacts() []Contact {
 		con.Email = email
 		con.LastName = last
 		con.FirstName = first
-		allContacts = append(allContacts, *con)
+		*allContacts = append(*allContacts, *con)
 	}, "elements")
 	if err != nil {
 		log.Fatalf("Error #77502: %s", err)
 	}
 
-	//fmt.Println("result:", allContacts)
-	return allContacts
+	keys := [][]string{[]string{"nextPage"}}
+	var nextPageURL string
+	jsonparser.EachKey(result, func(idx int, value []byte, dataType jsonparser.ValueType, err error) {
+		nextPageURL, _ = jsonparser.ParseString(value)
+		fmt.Println("nextPageURL:", nextPageURL)
+	}, keys...)
+
+	slots := strings.Split(nextPageURL, "skipToken=")
+	if len(slots) > 1 {
+		fmt.Println("recursion")
+		mList.GetAllContacts(slots[1], allContacts)
+	}
 }
 
 // DeleteContact - use the 'id' field of a Contact to issue and API call to remove it from the preset mailing list
