@@ -136,12 +136,10 @@ func (mList MailingList) GetAllContacts(nextPage string, allContacts *[]Contact)
 	var nextPageURL string
 	jsonparser.EachKey(result, func(idx int, value []byte, dataType jsonparser.ValueType, err error) {
 		nextPageURL, _ = jsonparser.ParseString(value)
-		fmt.Println("nextPageURL:", nextPageURL)
 	}, keys...)
 
 	slots := strings.Split(nextPageURL, "skipToken=")
 	if len(slots) > 1 {
-		fmt.Println("recursion")
 		mList.GetAllContacts(slots[1], allContacts)
 	}
 }
@@ -156,7 +154,6 @@ func (mList MailingList) DeleteContact(contactId string) bool {
 	}
 	successfulDelete := false
 	err = jsonparser.ObjectEach(meta, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
-		//fmt.Printf("Key: '%s'\n Value: '%s'\n Type: %s\n", string(key), string(value), dataType)
 		if string(key) == "httpStatus" {
 			if string(value) == "200 - OK" {
 				successfulDelete = true
