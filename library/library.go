@@ -23,7 +23,7 @@ type Library struct {
 
 // New - return a Library struct containing the name and connection information
 func New(name string) *Library {
-	id := generic(name, "/libraries", map[string]string {"name": "libraryName","id": "libraryId"})
+	id := generic(name, "/surveys", map[string]string {"name": "libraryName","id": "libraryId"})
 	if len(id) == 0 {
 		log.Fatalf("Error #47750: Library not found: %s\n", name)
 	}
