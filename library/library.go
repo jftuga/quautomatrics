@@ -23,7 +23,7 @@ type Library struct {
 
 // New - return a Library struct containing the name and connection information
 func New(name string) *Library {
-	id := generic(name, "/surveys", map[string]string {"name": "libraryName","id": "libraryId"})
+	id := generic(name, "/libraries", map[string]string {"name": "libraryName","id": "libraryId"})
 	if len(id) == 0 {
 		log.Fatalf("Error #47750: Library not found: %s\n", name)
 	}
@@ -65,7 +65,7 @@ func generic(objectName, path string, keys map[string]string) string {
 	_, err = jsonparser.ArrayEach(result, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		name, err = jsonparser.GetString(value, keys["name"])
 		if err != nil {
-			log.Fatalf("Error #20865: parsing JSON for key='%s'\n%s\n", keys["name"], value)
+			log.Fatalf("Error #20865: parsing JSON for objectName='%s', key='%s'\n%s\n", objectName, keys["name"], value)
 		}
 		if name == objectName { // mailing list is found, get its 'id'
 			hasList = true
