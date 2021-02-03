@@ -41,10 +41,6 @@ func (lib Library) GetLibraryMessage(name string) string {
 	return generic(name, fmt.Sprintf("/libraries/%s/messages?offset=0", lib.Id), map[string]string {"name": "description","id": "id"})
 }
 
-func GetSurveyId(name string) string {
-	return ""
-}
-
 // generic - make API call to to get the value of objectName
 // keys must contain two keys: name, id
 func generic(objectName, path string, keys map[string]string) string {
