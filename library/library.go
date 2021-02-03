@@ -38,7 +38,11 @@ func New(name string) *Library {
 }
 
 func (lib Library) GetLibraryMessage(name string) string {
-	return generic(name, fmt.Sprintf("/libraries/%s/messages?offset=0", lib.Id), map[string]string {"name": "description","id": "id"})
+	value := generic(name, fmt.Sprintf("/libraries/%s/messages?offset=0", lib.Id), map[string]string {"name": "description","id": "id"})
+	if len(value) == 0 {
+		log.Fatalf("Error #47752: Library Message not found: %s\n", name)
+	}
+	return value
 }
 
 // generic - make API call to to get the value of objectName
