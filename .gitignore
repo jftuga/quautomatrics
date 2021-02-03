@@ -19,3 +19,4 @@ quautomatrics_config.json
 *.tab
 m.bat
 dist/
+example*
