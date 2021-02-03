@@ -47,7 +47,6 @@ func init() {
 }
 
 func listLibraries() {
-	libraryName := libraryName
 	lib := library.New(libraryName)
 	fmt.Println("libraryId:", lib.Id)
 
