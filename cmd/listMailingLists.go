@@ -23,7 +23,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/jftuga/quautomatrics/survey"
+	"github.com/jftuga/quautomatrics/mailinglist"
 
 	"github.com/spf13/cobra"
 )
@@ -47,6 +47,6 @@ func init() {
 }
 
 func listMailingLists() {
-	mList := survey.New(mListName)
-	fmt.Println("surveyId:", mList.Id)
+	mList := mailingList.New(mListName)
+	fmt.Println("mailingListId:", mList.Id)
 }
