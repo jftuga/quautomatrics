@@ -37,7 +37,7 @@ import (
 var createContactsCmd = &cobra.Command{
 	Use:   "createContacts",
 	Short: "Add contacts to a mailing list",
-	Long: `This will add contacts to an existing list. It does not check for duplicates.`,
+	Long:  `This will add contacts to an existing list. It does not check for duplicates.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		//fmt.Println("createContacts called")
 		mList := mailingList.New(mailingListName)
@@ -77,7 +77,7 @@ func CreateContacts(mList *mailingList.MailingList, newContacts []mailingList.Co
 		request := mList.Conn.Rest.Post(path, buf)
 		meta, _, _, err := jsonparser.Get([]byte(request), "meta")
 		if err != nil {
-			log.Fatalf("Error #73639: parsing JSON for key='meta'\n%s\n", meta)
+			log.Fatalf("Error #90774: parsing JSON for key='meta'\n%s\n", meta)
 		}
 	}
 }
