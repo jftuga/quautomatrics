@@ -44,7 +44,16 @@ import (
 var createDistributionCmd = &cobra.Command{
 	Use:   "createDistribution",
 	Short: "Create a distribution file in JSON format",
-	Long:  `Long desc`,
+	Long:  `
+Macros can be used for date-time:
+
+_NOW_       => replaced with current date/time such as 2006-01-02T15:04:05Z
+_TODAY_     => replaced with current date such as 2006-01-02
+_YMD_       => same as _TODAY_
+_HMS_       => replaced with current time such as 15:04:05
+_TOMORROW_  => replaced with tomorrow's date such as 2006-01-03'
+_DAYS:n_    => replaced with n days in the future; when n=3 then 2006-01-05
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		//fmt.Println("createDistribution called")
 		createDistribution()
