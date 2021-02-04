@@ -27,8 +27,10 @@ import (
 	"github.com/jftuga/quautomatrics/distribution"
 	"github.com/jftuga/quautomatrics/library"
 	mailingList "github.com/jftuga/quautomatrics/mailinglist"
+	"github.com/jftuga/quautomatrics/rest"
 	"github.com/jftuga/quautomatrics/survey"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"os"
@@ -96,6 +98,17 @@ func createDistribution() {
 	fmt.Println()
 	dist := createDistributionEnvelope(envelope)
 	fmt.Println(dist)
+	fmt.Println()
+	uploadDistribution(dist)
+}
+
+func uploadDistribution(dist string) {
+	token := viper.GetString("X-API-TOKEN")
+	dc := viper.GetString("DATACENTER")
+	r := rest.New(token, dc)
+
+	status := r.Post("/distributions", []byte(dist))
+	fmt.Println("uploadDistribution status:", status)
 }
 
 func createDistributionEnvelope(envelope *DistributionEnvelope) string {
