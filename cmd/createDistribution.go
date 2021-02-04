@@ -23,12 +23,17 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/buger/jsonparser"
+	"github.com/jftuga/quautomatrics/distribution"
 	"github.com/jftuga/quautomatrics/library"
 	mailingList "github.com/jftuga/quautomatrics/mailinglist"
 	"github.com/jftuga/quautomatrics/survey"
 	"github.com/spf13/cobra"
+	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
+	"strings"
 )
 
 // createDistributionCmd represents the createDistribution command
@@ -42,10 +47,27 @@ var createDistributionCmd = &cobra.Command{
 	},
 }
 
-var outputFile, sendDate, expirationDate string
+type DistributionEnvelope struct {
+	libraryNameId string
+	messageNameId string
+	mailingListNameId string
+	surveyNameId string
+	sendDate string
+	expirationDate string
+	fromName string
+	subject string
+	replyToEmail string
+	fromEmail string
+}
+
+var configFile, outputFile, sendDate, expirationDate string
 
 func init() {
 	rootCmd.AddCommand(createDistributionCmd)
+
+	createDistributionCmd.Flags().StringVarP(&configFile, "configFile", "c", "", "JSON config file containing: fromName,fromEmail,replyToEmail,subject")
+	createDistributionCmd.MarkFlagRequired("configFile")
+
 	createDistributionCmd.Flags().StringVarP(&outputFile, "outputFile", "o", "", "save JSON data to this file (will overwrite existing file)")
 	createDistributionCmd.MarkFlagRequired("outputFile")
 
@@ -69,11 +91,39 @@ func init() {
 }
 
 func createDistribution() {
-	validateParameters()
+	envelope := validateParameters()
+	fmt.Println("envelope:", envelope)
+	fmt.Println()
+	dist := createDistributionEnvelope(envelope)
+	fmt.Println(dist)
 }
 
-func validateParameters() {
+func createDistributionEnvelope(envelope *DistributionEnvelope) string {
+	var dist string
+	dist = distribution.JsonDistributionTemplate
+	dist = strings.Replace(dist, "__LIBRARYID__", envelope.libraryNameId, 1)
+	dist = strings.Replace(dist, "__MESSAGEID__", envelope.messageNameId, 1)
+	dist = strings.Replace(dist, "__MAILINGLISTID__", envelope.mailingListNameId, 1)
+	dist = strings.Replace(dist, "__FROMNAME__", envelope.fromName, 1)
+	dist = strings.Replace(dist, "__REPLYTOEMAIL__", envelope.replyToEmail, 1)
+	dist = strings.Replace(dist, "__FROMEMAIL__", envelope.fromEmail, 1)
+	dist = strings.Replace(dist, "__SUBJECT__", envelope.subject, 1)
+	dist = strings.Replace(dist, "__SURVEYID__", envelope.surveyNameId, 1)
+	dist = strings.Replace(dist, "__EXPIRATIONDATE__", envelope.expirationDate, 1)
+	dist = strings.Replace(dist, "__SENDDATE__", envelope.sendDate, 1)
 
+	f, err := os.Create(outputFile)
+	if err != nil {
+		log.Fatalf("Error #16026: unable to open output file for writing: '%s'\n%s\n", outputFile, err)
+	}
+	f.WriteString(dist)
+	f.Close()
+	fmt.Printf("Saved distribution to file: '%s'\n", outputFile)
+
+	return dist
+}
+
+func validateParameters() *DistributionEnvelope {
 	// libraryID
 	lib := library.New(libraryName)
 	libraryNameId := lib.Id
@@ -109,8 +159,70 @@ func validateParameters() {
 		log.Fatalf("Error #40021: Invalid expirationDate: '%s'\n", expirationDate)
 	}
 
-	// TODO: validate the opening of the output file
+	// validate the opening of the output file
+	f, err := os.Create(outputFile)
+	if err != nil {
+		log.Fatalf("Error #40026: unable to open output file for writing: '%s'\n%s\n", outputFile, err)
+	}
+	f.Close()
 
-	fmt.Println(libraryNameId, messageNameId, mailingListNameId, surveyNameId, sendDate, expirationDate)
+	config, err := ioutil.ReadFile(configFile)
+	if err != nil {
+		log.Fatalf("Error #26021: Unable to read config file: '%s'\n%s\n", configFile, err)
+	}
 
+	var fromName, replyToEmail, fromEmail, subject string
+	handler := func(keyB []byte, valueB []byte, dataType jsonparser.ValueType, offset int) error {
+		key := string(keyB)
+		value:= string(valueB)
+
+		if key == "fromName" {
+			if len(value) < 5 {
+				log.Fatalf("Error #26051: Config file has invalid %s: '%s'\n", key, value)
+			}
+			fromName = value
+		} else if key == "subject" {
+			if len(value) < 5 {
+				log.Fatalf("Error #26052: Config file has invalid %s: '%s'\n", key, value)
+			}
+			subject = value
+		}  else if key == "replyToEmail" {
+			if isValidEmail(value) == false {
+				log.Fatalf("Error #26053: Config file has invalid %s: '%s'\n", key, value)
+			}
+			replyToEmail = value
+		} else if key == "fromEmail" {
+			if isValidEmail(value) == false {
+				log.Fatalf("Error #26054: Config file has invalid %s: '%s'\n", key, value)
+			}
+			fromEmail = value
+		}
+		return nil
+	}
+	jsonparser.ObjectEach(config, handler)
+	//fmt.Println("1:", libraryNameId, messageNameId, mailingListNameId, surveyNameId, sendDate, expirationDate)
+	//fmt.Println("2:", fromName, subject, replyToEmail, fromEmail)
+
+	var envelope DistributionEnvelope
+	envelope.libraryNameId = libraryNameId
+	envelope.messageNameId = messageNameId
+	envelope.mailingListNameId = mailingListNameId
+	envelope.surveyNameId = surveyNameId
+	envelope.sendDate = sendDate
+	envelope.expirationDate = expirationDate
+	envelope.fromName = fromName
+	envelope.subject = subject
+	envelope.replyToEmail = replyToEmail
+	envelope.fromEmail = fromEmail
+
+	return &envelope
+}
+
+func isValidEmail(address string) bool {
+	// https://golangcode.com/validate-an-email-address/
+	emailRegex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	if len(address) < 3 && len(address) > 254 {
+		return false
+	}
+	return emailRegex.MatchString(address)
 }

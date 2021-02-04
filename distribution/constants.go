@@ -1,6 +1,6 @@
 package distribution
 
-const jsonDistributionTemplate string = `{
+const JsonDistributionTemplate string = `{
  "message": {
     "libraryId": "__LIBRARYID__",
     "messageId": "__MESSAGEID__"
