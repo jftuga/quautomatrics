@@ -35,14 +35,16 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 )
 
 // createDistributionCmd represents the createDistribution command
 var createDistributionCmd = &cobra.Command{
 	Use:   "createDistribution",
 	Short: "Create a distribution file in JSON format",
-	Long: `Long desc`,
+	Long:  `Long desc`,
 	Run: func(cmd *cobra.Command, args []string) {
 		//fmt.Println("createDistribution called")
 		createDistribution()
@@ -50,16 +52,16 @@ var createDistributionCmd = &cobra.Command{
 }
 
 type DistributionEnvelope struct {
-	libraryNameId string
-	messageNameId string
+	libraryNameId     string
+	messageNameId     string
 	mailingListNameId string
-	surveyNameId string
-	sendDate string
-	expirationDate string
-	fromName string
-	subject string
-	replyToEmail string
-	fromEmail string
+	surveyNameId      string
+	sendDate          string
+	expirationDate    string
+	fromName          string
+	subject           string
+	replyToEmail      string
+	fromEmail         string
 }
 
 var configFile, outputFile, sendDate, expirationDate string
@@ -136,6 +138,54 @@ func createDistributionEnvelope(envelope *DistributionEnvelope) string {
 	return dist
 }
 
+func extractTimeDuration(t string, re *regexp.Regexp) int {
+	slots := re.FindStringSubmatch(t)
+	if len(slots) != 2 {
+		log.Fatalf("Error #89173: Invalid macro for _DAYS:_: '%s\n", t)
+	}
+	duration, err := strconv.Atoi(slots[1])
+	if err != nil {
+		log.Fatalf("Error #89027: Invalid time duration for: '%s\n%s\n", t, err)
+	}
+	return duration
+}
+
+func translateTimeMacos(t string) string {
+	currentTime := time.Now().UTC()
+	tomorrowTime := currentTime.AddDate(0, 0, 1)
+
+	// https://www.golangprograms.com/get-current-date-and-time-in-various-format-in-golang.html
+	t = strings.Replace(t, "_NOW_", currentTime.Format("2006-01-02T15:04:05Z"), 1)
+	t = strings.Replace(t, "_TODAY_", currentTime.Format("2006-01-02"), 1)
+	t = strings.Replace(t, "_YMD_", currentTime.Format("2006-01-02"), 1)
+	t = strings.Replace(t, "_HMS_", currentTime.Format("15:04:05"), 1)
+	t = strings.Replace(t, "_TOMORROW_", tomorrowTime.Format("2006-01-02"), 1)
+
+	if strings.Contains(t, "_DAYS:") == true {
+		daysRE, err := regexp.Compile("_DAYS:([0-9]+)_")
+		if err != nil {
+			log.Fatalf("Error #89052: Invalid macro for _DAYS:_: '%s\n%s\n", t, err)
+		}
+		duration := extractTimeDuration(t, daysRE)
+		futureTime := currentTime.AddDate(0, 0, duration)
+		t = daysRE.ReplaceAllString(t, futureTime.Format("2006-01-02"))
+	}
+	/*
+		// this is buggy and unreliable...
+		if strings.Contains(t,"_HOURS:") == true {
+			hoursRE, err := regexp.Compile("_HOURS:([0-9]+)_")
+			if err != nil {
+				log.Fatalf("Error #89054: Invalid macro for _HOURS:_: '%s\n%s\n", t, err)
+			}
+			duration := extractTimeDuration(t, hoursRE)
+			futureTime := currentTime.Add(time.Hour * time.Duration(duration))
+			t = hoursRE.ReplaceAllString(t,futureTime.Format("15"))
+		}
+	*/
+	return t
+
+}
+
 func validateParameters() *DistributionEnvelope {
 	// libraryID
 	lib := library.New(libraryName)
@@ -158,6 +208,11 @@ func validateParameters() *DistributionEnvelope {
 	survey := survey.New(surveyName)
 	surveyNameId := survey.Id
 
+	// make time substitutions
+	sendDate = translateTimeMacos(sendDate)
+	expirationDate = translateTimeMacos(expirationDate)
+
+	// validate datetime
 	// https://stackoverflow.com/a/28022901
 	validDateRE := "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:Z|[+-][01]\\d:[0-5]\\d)$"
 	validDate := regexp.MustCompile(validDateRE)
@@ -187,7 +242,7 @@ func validateParameters() *DistributionEnvelope {
 	var fromName, replyToEmail, fromEmail, subject string
 	handler := func(keyB []byte, valueB []byte, dataType jsonparser.ValueType, offset int) error {
 		key := string(keyB)
-		value:= string(valueB)
+		value := string(valueB)
 
 		if key == "fromName" {
 			if len(value) < 5 {
@@ -199,7 +254,7 @@ func validateParameters() *DistributionEnvelope {
 				log.Fatalf("Error #26052: Config file has invalid %s: '%s'\n", key, value)
 			}
 			subject = value
-		}  else if key == "replyToEmail" {
+		} else if key == "replyToEmail" {
 			if isValidEmail(value) == false {
 				log.Fatalf("Error #26053: Config file has invalid %s: '%s'\n", key, value)
 			}
