@@ -12,7 +12,7 @@ const JsonDistributionTemplate string = `{
     "fromName": "__FROMNAME__",
     "replyToEmail": "__REPLYTOEMAIL__",
     "fromEmail": "__FROMEMAIL__",
-    "subject": "__SUBJECT__"
+    "subject": "__EMAILSUBJECT__"
   },
   "surveyLink": {
     "surveyId": "__SURVEYID__",

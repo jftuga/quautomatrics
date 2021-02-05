@@ -66,17 +66,17 @@ type DistributionEnvelope struct {
 	sendDate          string
 	expirationDate    string
 	fromName          string
-	subject           string
+	emailSubject           string
 	replyToEmail      string
 	fromEmail         string
 }
 
-var configFile, outputFile, sendDate, expirationDate string
+var configFile, outputFile, sendDate, expirationDate, emailSubject string
 
 func init() {
 	rootCmd.AddCommand(createDistributionCmd)
 
-	createDistributionCmd.Flags().StringVarP(&configFile, "configFile", "c", "", "JSON config file containing: fromName,fromEmail,replyToEmail,subject")
+	createDistributionCmd.Flags().StringVarP(&configFile, "configFile", "c", "", "JSON config file containing: fromName,fromEmail,replyToEmail,emailSubject")
 	createDistributionCmd.MarkFlagRequired("configFile")
 
 	createDistributionCmd.Flags().StringVarP(&outputFile, "outputFile", "o", "", "save JSON data to this file (will overwrite existing file)")
@@ -93,6 +93,9 @@ func init() {
 
 	createDistributionCmd.Flags().StringVarP(&surveyName, "surveyName", "s", "", "name of existing survey")
 	createDistributionCmd.MarkFlagRequired("surveyName")
+
+	createDistributionCmd.Flags().StringVarP(&emailSubject, "emailSubject", "j", "", "email subject")
+	createDistributionCmd.MarkFlagRequired("emailSubject")
 
 	createDistributionCmd.Flags().StringVarP(&sendDate, "sendDate", "d", "", "format: YYYY-MM-DDTHH:MM:SSZ")
 	createDistributionCmd.MarkFlagRequired("sendDate")
@@ -115,7 +118,7 @@ func createDistributionEnvelope(envelope *DistributionEnvelope) string {
 	dist = strings.Replace(dist, "__FROMNAME__", envelope.fromName, 1)
 	dist = strings.Replace(dist, "__REPLYTOEMAIL__", envelope.replyToEmail, 1)
 	dist = strings.Replace(dist, "__FROMEMAIL__", envelope.fromEmail, 1)
-	dist = strings.Replace(dist, "__SUBJECT__", envelope.subject, 1)
+	dist = strings.Replace(dist, "__EMAILSUBJECT__", envelope.emailSubject, 1)
 	dist = strings.Replace(dist, "__SURVEYID__", envelope.surveyNameId, 1)
 	dist = strings.Replace(dist, "__EXPIRATIONDATE__", envelope.expirationDate, 1)
 	dist = strings.Replace(dist, "__SENDDATE__", envelope.sendDate, 1)
@@ -193,6 +196,14 @@ func validateParameters() *DistributionEnvelope {
 		}
 	}
 
+	// emailSubject
+	if len(emailSubject) <= 5 {
+		log.Fatalf("Error #40015: email subject is too short: '%s'\n", emailSubject)
+	}
+	if len(emailSubject) >= 45 {
+		log.Fatalf("Error #40016: email subject is too long: '%s'\n", emailSubject)
+	}
+
 	// mailingListId
 	mList := mailingList.New(mailingListName)
 	mailingListNameId := mList.Id
@@ -232,7 +243,7 @@ func validateParameters() *DistributionEnvelope {
 		log.Fatalf("Error #26021: Unable to read config file: '%s'\n%s\n", configFile, err)
 	}
 
-	var fromName, replyToEmail, fromEmail, subject string
+	var fromName, replyToEmail, fromEmail string
 	handler := func(keyB []byte, valueB []byte, dataType jsonparser.ValueType, offset int) error {
 		key := string(keyB)
 		value := string(valueB)
@@ -242,11 +253,6 @@ func validateParameters() *DistributionEnvelope {
 				log.Fatalf("Error #26051: Config file has invalid %s: '%s'\n", key, value)
 			}
 			fromName = value
-		} else if key == "subject" {
-			if len(value) < 5 {
-				log.Fatalf("Error #26052: Config file has invalid %s: '%s'\n", key, value)
-			}
-			subject = value
 		} else if key == "replyToEmail" {
 			if isValidEmail(value) == false {
 				log.Fatalf("Error #26053: Config file has invalid %s: '%s'\n", key, value)
@@ -262,7 +268,7 @@ func validateParameters() *DistributionEnvelope {
 	}
 	jsonparser.ObjectEach(config, handler)
 	//fmt.Println("1:", libraryNameId, messageNameId, mailingListNameId, surveyNameId, sendDate, expirationDate)
-	//fmt.Println("2:", fromName, subject, replyToEmail, fromEmail)
+	//fmt.Println("2:", fromName, emailSubject, replyToEmail, fromEmail)
 
 	var envelope DistributionEnvelope
 	envelope.libraryNameId = libraryNameId
@@ -272,7 +278,7 @@ func validateParameters() *DistributionEnvelope {
 	envelope.sendDate = sendDate
 	envelope.expirationDate = expirationDate
 	envelope.fromName = fromName
-	envelope.subject = subject
+	envelope.emailSubject = emailSubject
 	envelope.replyToEmail = replyToEmail
 	envelope.fromEmail = fromEmail
 

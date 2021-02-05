@@ -3,6 +3,5 @@
   "DATACENTER": "zz0",
   "fromName": "My Company Name",
   "replyToEmail": "noreply@qualtrics.com",
-  "fromEmail": "noreply@qualtrics.com",
-  "subject": "Please take our survey"
+  "fromEmail": "noreply@qualtrics.com"
 }
