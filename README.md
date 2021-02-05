@@ -4,7 +4,7 @@ Command-line automation of Qualtrics surveys
 ### Usage
 
 ```
-Quautomatrics can perform basic operations on Qualtrics contacts and mailing lists
+Quautomatrics can perform basic operations on Qualtrics™ contacts, mailing lists, and distributions
 
 Usage:
   quautomatrics [command]

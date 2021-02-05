@@ -37,7 +37,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "quautomatrics",
 	Short: "Command-line automation of Qualtrics surveys",
-	Long: `Quautomatrics can perform basic operations on Qualtrics contacts and mailing lists`,
+	Long: `Quautomatrics can perform basic operations on Qualtrics™ contacts, mailing lists, and distributions`,
 	Version: pgmVersion,
 }
 
