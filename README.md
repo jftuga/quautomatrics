@@ -95,6 +95,21 @@ These macros can be used in the `createDistribution` command with the `-d` and `
 ### License
 * [MIT License](https://github.com/jftuga/quautomatrics/blob/main/LICENSE)
 
+### API
+
+This program **does not** use the XM Directory API. Instead, it uses the `Research Core Contacts` API.
+
+APIs used:
+
+* [Create Distribution](https://api.qualtrics.com/instructions/reference/distributions.json/paths/~1distributions/post)
+* [List Libraries](https://api.qualtrics.com/instructions/reference/libraries.json/paths/~1libraries/get)
+* [List Library Messages](https://api.qualtrics.com/instructions/reference/libraries.json/paths/~1libraries~1%7BlibraryId%7D~1messages/get)
+* [List Mailing Lists](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists/get)
+* [Update Mailing List](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D/put)
+* [List Contacts](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D~1contacts/get)
+* [Delete Contacts](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D~1contacts~1%7BcontactId%7D/delete)
+* [Create Contacts](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D~1contacts/post)
+
 ### Acknowledgements
 * [cobra](https://github.com/spf13/cobra)
 * [viper](https://github.com/spf13/viper)
