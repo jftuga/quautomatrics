@@ -92,9 +92,6 @@ These macros can be used in the `createDistribution` command with the `-d` and `
 | `_TOMORROW_`  | replaced with tomorrow's date such as `2006-01-03` | 
 | `_DAYS:n_`    | replaced with *n* days into the future; when n=3 then `2006-01-05` |
 
-### License
-* [MIT License](https://github.com/jftuga/quautomatrics/blob/main/LICENSE)
-
 ### API
 
 This program **does not** use the XM Directory API. Instead, it uses the `Research Core Contacts` API.
@@ -109,6 +106,9 @@ APIs used:
 * [List Contacts](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D~1contacts/get)
 * [Delete Contacts](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D~1contacts~1%7BcontactId%7D/delete)
 * [Create Contacts](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D~1contacts/post)
+
+### License
+* [MIT License](https://github.com/jftuga/quautomatrics/blob/main/LICENSE)
 
 ### Acknowledgements
 * [cobra](https://github.com/spf13/cobra)
