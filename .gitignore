@@ -21,3 +21,4 @@ m.bat
 dist/
 example*
 atester.bat
+Send-DailyInvitations.ps1
