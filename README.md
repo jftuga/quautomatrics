@@ -10,10 +10,15 @@ Usage:
   quautomatrics [command]
 
 Available Commands:
-  createContacts  Add contacts to a mailing list
-  deleteContacts  Remove all contacts from a mailing list
-  help            Help about any command
-  replaceContacts Replace all mailing list entries with CSV entries
+  createContacts     Add contacts to a mailing list
+  createDistribution Create a distribution file in JSON format
+  deleteContacts     Remove all contacts from a mailing list
+  help               Help about any command
+  listLibraries      List all libraries. A library is needed in order to create a Distribution.
+  listMailingLists   Get a mailing-list ID
+  listSurveys        Get a survey ID.
+  replaceContacts    Replace all mailing list entries with CSV entries
+  uploadDistribution Upload a distribution file
 
 Flags:
       --config string   config file (default is quautomatrics_config.json)
@@ -21,6 +26,7 @@ Flags:
   -v, --version         version for quautomatrics
 
 Use "quautomatrics [command] --help" for more information about a command.
+
 ```
 
 ### Examples
@@ -49,6 +55,43 @@ quautomatrics deleteContacts -m My_Fancy_Survey
 ```shell
 quautomatrics replaceContacts -m My_Fancy_Survey -c newPeople.csv
 ```
+
+**Contents of quautomatrics_config.json**
+```json
+{
+  "X-API-TOKEN": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "DATACENTER": "zz1",
+  "fromName": "My Company Name",
+  "replyToEmail": "noreply@qualtrics.com",
+  "fromEmail": "noreply@qualtrics.com",
+  "subject": "Please take our survey"
+}
+```
+
+**Creating a Distribution**
+```shell
+quautomatrics.exe createDistribution -c quautomatrics_config.json -o distribution.json -l "Inquiry Survey" 
+-m "Invitation Email" -n "My_Contacts"  -s "My_Fancy_Survey" -d "_NOW_" -e "_DAYS:5_T23:59:59Z"
+```
+
+**Uploading a Distribution**
+```shell
+quautomatrics.exe uploadDistribution -d distribution.json
+```
+
+### Date-Time Macros
+
+These macros can be used in the `createDistribution` command with the `-d` and `-e` options:
+
+| Macro         | Description 
+|---------------|------------- 
+| `_NOW_`       | replaced with current date/time such as `2006-01-02T15:04:05Z` |
+| `_TODAY_`     | replaced with current date such as `2006-01-02` |
+| `_YMD_`       | same as `_TODAY_` |
+| `_HMS_`       | replaced with current time such as `15:04:05` | 
+| `_TOMORROW_`  | replaced with tomorrow's date such as `2006-01-03` | 
+| `_DAYS:n_`    | replaced with *n* days into the future; when n=3 then `2006-01-05` |
+
 ### License
 * [MIT License](https://github.com/jftuga/quautomatrics/blob/main/LICENSE)
 
@@ -56,4 +99,3 @@ quautomatrics replaceContacts -m My_Fancy_Survey -c newPeople.csv
 * [cobra](https://github.com/spf13/cobra)
 * [viper](https://github.com/spf13/viper)
 * [jsonparser](https://github.com/buger/jsonparser)
-
