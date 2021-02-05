@@ -1,5 +1,5 @@
 # quautomatrics
-Command-line automation of Qualtrics surveys
+Command-line automation of Qualtrics™ surveys
 
 ### Usage
 
@@ -99,3 +99,4 @@ These macros can be used in the `createDistribution` command with the `-d` and `
 * [cobra](https://github.com/spf13/cobra)
 * [viper](https://github.com/spf13/viper)
 * [jsonparser](https://github.com/buger/jsonparser)
+* **Please note that there is no official affiliation between Qualtrics™ and `quautomatrics`**
