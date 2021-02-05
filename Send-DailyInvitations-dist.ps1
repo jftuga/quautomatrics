@@ -19,6 +19,18 @@ $mailingListName = "(to be filled in)"
 
 
 function main($options) {
+    # replace contacts with CSV filename given on cmd-line
+    $new_contacts = $options[0]
+    echo "new contacts: $new_contacts"
+    if( -not (test-path $new_contacts) ) {
+        write-error "File not found: $new_contacts"
+        return
+    }
+    $cmd = ".\quautomatrics.exe replaceContacts -m '$mailingListName' -c '$new_contacts'"
+    echo $cmd
+    Invoke-Expression $cmd
+
+    # create distribution
     rm -force -erroraction silentlycontinue $outputFile
     $today = (get-date).DayOfWeek
     $emailSubject = ""
@@ -36,6 +48,7 @@ function main($options) {
     echo $cmd
     Invoke-Expression $cmd
 
+    # upload newly created distribution
     if (test-path $outputFile) {
         $cmd = ".\quautomatrics.exe uploadDistribution -d '$outputFile'"
         echo $cmd
