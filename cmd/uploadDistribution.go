@@ -52,6 +52,9 @@ func init() {
 	uploadDistributionCmd.MarkFlagRequired("distFile")
 }
 
+// uploadDistribution - this is the main entry point for this file
+// given a JSON file created by the createDistribution' cli option,
+// upload it and make this distribution available for sending out survy invitations
 func uploadDistribution() {
 	dist, err := ioutil.ReadFile(distFile)
 	if err != nil {

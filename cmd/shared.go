@@ -9,6 +9,7 @@ import (
 )
 
 // getCSVEntries - convert a CSV entry into an array of Contact
+// CSV format: first,last,email
 func getCSVEntries() []mailingList.Contact {
 	file, err := os.Open(csvFile)
 	if err != nil {

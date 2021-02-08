@@ -4,6 +4,7 @@ const pgmName string = "quautomatrics"
 const pgmVersion string = "1.1.1"
 const pgmURL string = "https://github.com/jftuga/quautomatrics"
 
+// used by createDistribution
 const JsonDistributionTemplate string = `{
  "message": {
     "libraryId": "__LIBRARYID__",

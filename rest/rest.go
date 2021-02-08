@@ -22,7 +22,7 @@ func New(token, datacenter string) *Rest {
 	}
 }
 
-// action - generic function called by Get and Delete
+// action - a backend, generic function called by Get and Delete
 func (rest Rest) action(verb, path string) string {
 	url := rest.BaseURL + path
 	req, err := http.NewRequest(verb, url, nil)

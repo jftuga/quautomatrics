@@ -46,6 +46,8 @@ func init() {
 	listLibrariesCmd.Flags().StringVarP(&messageName, "message", "m", "", "preexisting library message")
 }
 
+// listLibraries - output the Id and MessageID returned via the API
+// when given a library name and message  (--name, --message cli options)
 func listLibraries() {
 	lib := library.New(libraryName)
 	fmt.Println("libraryId:", lib.Id)

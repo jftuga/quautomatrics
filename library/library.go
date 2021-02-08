@@ -37,6 +37,8 @@ func New(name string) *Library {
 	}
 }
 
+// GetLibraryMessage - used by the listLibraries and createDistribution cli commands
+// given the library id from lib.Id, return the library message
 func (lib Library) GetLibraryMessage(name string) string {
 	value := Generic(name, fmt.Sprintf("/libraries/%s/messages?offset=0", lib.Id), map[string]string {"name": "description","id": "id"})
 	if len(value) == 0 {
@@ -45,7 +47,7 @@ func (lib Library) GetLibraryMessage(name string) string {
 	return value
 }
 
-// generic - make API call to to get the value of objectName
+// Generic - make API call to to get the value of objectName
 // keys must contain two keys: name, id
 func Generic(objectName, path string, keys map[string]string) string {
 	token := viper.GetString("X-API-TOKEN")

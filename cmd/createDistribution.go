@@ -103,11 +103,14 @@ func init() {
 	createDistributionCmd.MarkFlagRequired("expirationDate")
 }
 
+// createDistribution - this is the main entry point for this file
 func createDistribution() {
 	envelope := validateParameters()
 	createDistributionEnvelope(envelope)
 }
 
+// createDistributionEnvelope - create a JSON string suitable for the "/distributions" API endpoint
+// the resulting string will be saved to a file given by this cmd-line option: --outputFile
 func createDistributionEnvelope(envelope *DistributionEnvelope) string {
 	var dist string
 	dist = JsonDistributionTemplate
@@ -133,10 +136,13 @@ func createDistributionEnvelope(envelope *DistributionEnvelope) string {
 	return dist
 }
 
+// extractTimeDuration - extract an integer value from t when given re
+// example input: _DAYS:5_
+// example output: 5
 func extractTimeDuration(t string, re *regexp.Regexp) int {
 	slots := re.FindStringSubmatch(t)
 	if len(slots) != 2 {
-		log.Fatalf("Error #89173: Invalid macro for _DAYS:_: '%s\n", t)
+		log.Fatalf("Error #89173: Invalid macro for regular expression: '%s\n", t)
 	}
 	duration, err := strconv.Atoi(slots[1])
 	if err != nil {
@@ -145,6 +151,9 @@ func extractTimeDuration(t string, re *regexp.Regexp) int {
 	return duration
 }
 
+// translateTimeMacos - convert macros surrounded by underscores to their
+// corresponding date / time values
+// these are used by these cmd-line options: --sendDate and --expirationDate
 func translateTimeMacos(t string) string {
 	currentTime := time.Now().UTC()
 	tomorrowTime := currentTime.AddDate(0, 0, 1)
@@ -181,6 +190,13 @@ func translateTimeMacos(t string) string {
 
 }
 
+// validateParameters - Certify that all command-line parameter are valid
+// Make API calls to ensure a valid: libraryID, mailingListId, surveyId
+// perform date-time macro substitutions
+// ensure that timestamps are in the correct format
+// ensure the config file contains: fromName, replyToEmail, fromEmail
+// ensure the output file can be opened for writing
+// once everything is validated, return a DistributionEnvelope containing all of this information
 func validateParameters() *DistributionEnvelope {
 	// libraryID
 	lib := library.New(libraryName)

@@ -46,6 +46,7 @@ func init() {
 	listMailingListsCmd.MarkFlagRequired("name")
 }
 
+// listMailingLists - return the mailing list id when given a mailing list name with the --name cli option
 func listMailingLists() {
 	mList := mailingList.New(mListName)
 	fmt.Println("mailingListId:", mList.Id)

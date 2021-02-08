@@ -46,6 +46,7 @@ func init() {
 	listSurveysCmd.MarkFlagRequired("name")
 }
 
+// listSurveys - return the survey id when given a survey name with the --name cli option
 func listSurveys() {
 	survey := survey.New(surveyName)
 	fmt.Println("surveyId:", survey.Id)
