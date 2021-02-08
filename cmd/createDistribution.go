@@ -24,7 +24,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/buger/jsonparser"
-	"github.com/jftuga/quautomatrics/distribution"
 	"github.com/jftuga/quautomatrics/library"
 	mailingList "github.com/jftuga/quautomatrics/mailinglist"
 	"github.com/jftuga/quautomatrics/survey"
@@ -111,7 +110,7 @@ func createDistribution() {
 
 func createDistributionEnvelope(envelope *DistributionEnvelope) string {
 	var dist string
-	dist = distribution.JsonDistributionTemplate
+	dist = JsonDistributionTemplate
 	dist = strings.Replace(dist, "__LIBRARYID__", envelope.libraryNameId, 1)
 	dist = strings.Replace(dist, "__MESSAGEID__", envelope.messageNameId, 1)
 	dist = strings.Replace(dist, "__MAILINGLISTID__", envelope.mailingListNameId, 1)
