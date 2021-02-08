@@ -23,7 +23,7 @@ type Library struct {
 
 // New - return a Library struct containing the name and connection information
 func New(name string) *Library {
-	id := generic(name, "/libraries", map[string]string {"name": "libraryName","id": "libraryId"})
+	id := Generic(name, "/libraries", map[string]string {"name": "libraryName","id": "libraryId"})
 	if len(id) == 0 {
 		log.Fatalf("Error #47750: Library not found: %s\n", name)
 	}
@@ -38,7 +38,7 @@ func New(name string) *Library {
 }
 
 func (lib Library) GetLibraryMessage(name string) string {
-	value := generic(name, fmt.Sprintf("/libraries/%s/messages?offset=0", lib.Id), map[string]string {"name": "description","id": "id"})
+	value := Generic(name, fmt.Sprintf("/libraries/%s/messages?offset=0", lib.Id), map[string]string {"name": "description","id": "id"})
 	if len(value) == 0 {
 		log.Fatalf("Error #47752: Library Message not found: %s\n", name)
 	}
@@ -47,7 +47,7 @@ func (lib Library) GetLibraryMessage(name string) string {
 
 // generic - make API call to to get the value of objectName
 // keys must contain two keys: name, id
-func generic(objectName, path string, keys map[string]string) string {
+func Generic(objectName, path string, keys map[string]string) string {
 	token := viper.GetString("X-API-TOKEN")
 	dc := viper.GetString("DATACENTER")
 	r := rest.New(token, dc)
