@@ -113,5 +113,6 @@ APIs used:
 ### Acknowledgements
 * [cobra](https://github.com/spf13/cobra)
 * [viper](https://github.com/spf13/viper)
+* * [go-homedir](https://github.com/mitchellh/go-homedir) 
 * [jsonparser](https://github.com/buger/jsonparser)
 * **Please note that there is no official affiliation between Qualtrics™ and `quautomatrics`**
