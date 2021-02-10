@@ -3,7 +3,6 @@ package rest
 import (
 	"encoding/json"
 	"github.com/buger/jsonparser"
-	"github.com/jftuga/OLD--qualtrics_survey/rest"
 	"github.com/spf13/viper"
 	"log"
 )
@@ -61,7 +60,7 @@ func Generic(objectName, path string, keys map[string]string) string {
 func GenericMap(path string, keys map[string]string) map[string]string {
 	token := viper.GetString("X-API-TOKEN")
 	dc := viper.GetString("DATACENTER")
-	r := rest.New(token, dc)
+	r := New(token, dc)
 	allObjects := r.Get(path)
 
 	// validate JSON returned from API
