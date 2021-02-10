@@ -23,8 +23,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/jftuga/quautomatrics/rest"
 	"github.com/jftuga/quautomatrics/survey"
-
 	"github.com/spf13/cobra"
 )
 
@@ -43,11 +43,18 @@ var surveyName string
 func init() {
 	rootCmd.AddCommand(listSurveysCmd)
 	listSurveysCmd.Flags().StringVarP(&surveyName, "name", "n", "", "preexisting survey name")
-	listSurveysCmd.MarkFlagRequired("name")
+	//listSurveysCmd.MarkFlagRequired("name")
 }
 
 // listSurveys - return the survey id when given a survey name with the --name cli option
 func listSurveys() {
+	if len(surveyName) == 0 {
+		allSurveys := rest.GenericMap("/surveys", map[string]string {"name": "name","id": "id"})
+		for name, id := range allSurveys {
+			fmt.Println("surveyId:", id, " name:", name)
+		}
+		return
+	}
 	survey := survey.New(surveyName)
 	fmt.Println("surveyId:", survey.Id)
 }
