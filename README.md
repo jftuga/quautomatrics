@@ -29,6 +29,14 @@ Use "quautomatrics [command] --help" for more information about a command.
 
 ```
 
+### Prerequisites
+* A Qualtrics™ account with access to the `Research Core Contacts` API.
+* * This program **does not** use the `XM Directory` API.
+* You will need an `API Token` which is located under:
+* * `Account Settings` => `Qualtrics IDs` => `API`
+* Your `Datacenter ID` which is located under:
+* * `Account Settings` => `Qualtrics IDs` => `User`
+
 ### Examples
 
 * Rename `quautomatrics_config-dist.json` to `quautomatrics_config.json`
