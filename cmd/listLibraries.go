@@ -24,6 +24,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/jftuga/quautomatrics/library"
+	"github.com/jftuga/quautomatrics/rest"
 	"github.com/spf13/cobra"
 )
 
@@ -42,13 +43,24 @@ var listLibrariesCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(listLibrariesCmd)
 	listLibrariesCmd.Flags().StringVarP(&libraryName, "name", "n", "", "preexisting library name")
-	listLibrariesCmd.MarkFlagRequired("name")
+	//listLibrariesCmd.MarkFlagRequired("name")
 	listLibrariesCmd.Flags().StringVarP(&messageName, "message", "m", "", "preexisting library message")
 }
 
 // listLibraries - output the Id and MessageID returned via the API
 // when given a library name and message  (--name, --message cli options)
 func listLibraries() {
+	if len(libraryName) == 0 {
+		allLibraries := rest.GenericMap("/libraries", map[string]string {"name": "libraryName","id": "libraryId"})
+		if len(allLibraries) == 0 {
+			fmt.Println("No libraries were returned by the API.")
+		}
+		for name, id := range allLibraries {
+			fmt.Println("libraryId:", id, " name:", name)
+		}
+		return
+	}
+
 	lib := library.New(libraryName)
 	fmt.Println("libraryId:", lib.Id)
 
