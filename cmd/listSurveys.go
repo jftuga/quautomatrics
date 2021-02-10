@@ -50,6 +50,9 @@ func init() {
 func listSurveys() {
 	if len(surveyName) == 0 {
 		allSurveys := rest.GenericMap("/surveys", map[string]string {"name": "name","id": "id"})
+		if len(allSurveys) == 0 {
+			fmt.Println("No surveys were returned by the API.")
+		}
 		for name, id := range allSurveys {
 			fmt.Println("surveyId:", id, " name:", name)
 		}
