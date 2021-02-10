@@ -24,6 +24,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/jftuga/quautomatrics/mailinglist"
+	"github.com/jftuga/quautomatrics/rest"
 
 	"github.com/spf13/cobra"
 )
@@ -43,11 +44,21 @@ var mListName string
 func init() {
 	rootCmd.AddCommand(listMailingListsCmd)
 	listMailingListsCmd.Flags().StringVarP(&mListName, "name", "n", "", "preexisting mailing-list name")
-	listMailingListsCmd.MarkFlagRequired("name")
+	//listMailingListsCmd.MarkFlagRequired("name")
 }
 
 // listMailingLists - return the mailing list id when given a mailing list name with the --name cli option
 func listMailingLists() {
+	if len(mListName) == 0 {
+		allMailingLists := rest.GenericMap("/mailinglists", map[string]string {"name": "name","id": "id"})
+		if len(allMailingLists) == 0 {
+			fmt.Println("No mailing lists were returned by the API.")
+		}
+		for name, id := range allMailingLists {
+			fmt.Println("mailingListId:", id, " name:", name)
+		}
+		return
+	}
 	mList := mailingList.New(mListName)
 	fmt.Println("mailingListId:", mList.Id)
 }
