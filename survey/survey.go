@@ -1,7 +1,6 @@
 package survey
 
 import (
-	"github.com/jftuga/quautomatrics/library"
 	"github.com/jftuga/quautomatrics/rest"
 	"github.com/spf13/viper"
 	"log"
@@ -21,7 +20,7 @@ type Library struct {
 
 // New - return a Library struct containing the name and connection information
 func New(name string) *Library {
-	id := library.Generic(name, "/surveys", map[string]string {"name": "name","id": "id"})
+	id := rest.Generic(name, "/surveys", map[string]string {"name": "name","id": "id"})
 	if len(id) == 0 {
 		log.Fatalf("Error #49950: Survey not found: %s\n", name)
 	}
