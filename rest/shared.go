@@ -13,7 +13,7 @@ import (
 func Generic(objectName, path string, keys map[string]string) string {
 	token := viper.GetString("X-API-TOKEN")
 	dc := viper.GetString("DATACENTER")
-	r := rest.New(token, dc)
+	r := New(token, dc)
 	allObjects := r.Get(path)
 
 	// validate JSON returned from API
