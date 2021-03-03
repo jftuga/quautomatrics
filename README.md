@@ -60,6 +60,10 @@ quautomatrics deleteContacts -m My_Fancy_Survey
 **Replace Contacts**
 * This will first remove all contacts and then add new contacts from a `CSV` file.
 
+```shell
+quautomatrics replaceContacts -m My_Fancy_Survey -c newPeople.csv
+```
+
 **List**
 * The `listLibraries`, `listMailingLists` and `listSurveys` commands will list all items returned by the API.
 * * The `-n` command-line switch can also be used to limit the listing to just one entry.
@@ -80,10 +84,6 @@ libraryId: UR_12xxxxxxxxxxxxx
 messageId: MS_45xxxxxxxxxxxxx  name: Invite A
 messageId: MS_56xxxxxxxxxxxxx  name: Invite B
 messageId: MS_67xxxxxxxxxxxxx  name: Invite C
-```
-
-```shell
-quautomatrics replaceContacts -m My_Fancy_Survey -c newPeople.csv
 ```
 
 **Contents of quautomatrics_config.json**
