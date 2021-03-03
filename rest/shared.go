@@ -78,11 +78,11 @@ func GenericMap(path string, keys map[string]string) map[string]string {
 	_, err = jsonparser.ArrayEach(result, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		name, err = jsonparser.GetString(value, keys["name"])
 		if err != nil {
-			log.Fatalf("Error #32865: parsing JSON for name='%s', key='%s'\n%s\n", name, keys["name"], value)
+			log.Fatalf("Error #32865: parsing JSON for name='%s', key='%s'\n%s\n%s\n", name, keys["name"], value, err)
 		}
 		objectValue, err = jsonparser.GetString(value, keys["id"])
 		if err != nil {
-			log.Fatalf("Error #32845: parsing JSON for key='%s'\n%s\n", keys["id"], value)
+			log.Fatalf("Error #32845: parsing JSON for key='%s'\n%s\n%s\n", keys["id"], value, err)
 		}
 		//fmt.Println(name, objectValue)
 		returnedData[name] = objectValue
