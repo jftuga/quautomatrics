@@ -44,3 +44,13 @@ func (lib Library) GetLibraryMessage(name string) string {
 	}
 	return value
 }
+
+// GetAllLibraryMessage - used by the listLibraries -M option
+// given the library id from lib.Id, return all of library messages
+func (lib Library) GetAllLibraryMessage() map[string]string {
+	value := rest.GenericMap(fmt.Sprintf("/libraries/%s/messages?offset=0", lib.Id), map[string]string {"name": "description", "id": "id"})
+	if len(value) == 0 {
+		log.Fatalln("Error #47852: No Library Messages were found.")
+	}
+	return value
+}

@@ -26,9 +26,11 @@ import (
 	"github.com/jftuga/quautomatrics/library"
 	"github.com/jftuga/quautomatrics/rest"
 	"github.com/spf13/cobra"
+	"log"
 )
 
 var libraryName, messageName string
+var allMessages bool
 
 // listLibrariesCmd represents the listLibraries command
 var listLibrariesCmd = &cobra.Command{
@@ -45,12 +47,16 @@ func init() {
 	listLibrariesCmd.Flags().StringVarP(&libraryName, "name", "n", "", "preexisting library name")
 	//listLibrariesCmd.MarkFlagRequired("name")
 	listLibrariesCmd.Flags().StringVarP(&messageName, "message", "m", "", "preexisting library message")
+	listLibrariesCmd.Flags().BoolVarP(&allMessages, "allMessages", "M", false, "list all library messages")
 }
 
 // listLibraries - output the Id and MessageID returned via the API
 // when given a library name and message  (--name, --message cli options)
 func listLibraries() {
 	if len(libraryName) == 0 {
+		if allMessages {
+			log.Fatalln("Error #70062: The -M option must be used with -n option.")
+		}
 		allLibraries := rest.GenericMap("/libraries", map[string]string {"name": "libraryName","id": "libraryId"})
 		if len(allLibraries) == 0 {
 			fmt.Println("No libraries were returned by the API.")
@@ -68,6 +74,13 @@ func listLibraries() {
 		messageId := lib.GetLibraryMessage(messageName)
 		if len(messageId) > 0 {
 			fmt.Println("libraryMessageId:", messageId)
+		}
+	} else if allMessages {
+		allLibraryMessages :=  lib.GetAllLibraryMessage()
+		if len(allLibraryMessages) > 0 {
+			for msgName, msgID := range allLibraryMessages {
+				fmt.Println("messageId:", msgID, " name:", msgName)
+			}
 		}
 	}
 }

@@ -71,6 +71,17 @@ libraryId: UR_12xxxxxxxxxxxxx  name: Test Library
 libraryId: GR_34xxxxxxxxxxxxx  name: Qualtrics Library
 ```
 
+* To list all messages within an individual library, use the `-M` switch.
+
+```shell
+quautomatrics.exe listLibraries -n "Test Library" -M
+
+libraryId: UR_12xxxxxxxxxxxxx
+messageId: MS_45xxxxxxxxxxxxx  name: Invite A
+messageId: MS_56xxxxxxxxxxxxx  name: Invite B
+messageId: MS_67xxxxxxxxxxxxx  name: Invite C
+```
+
 ```shell
 quautomatrics replaceContacts -m My_Fancy_Survey -c newPeople.csv
 ```
