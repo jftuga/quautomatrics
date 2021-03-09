@@ -26,10 +26,9 @@ func getCSVEntries() []mailingList.Contact {
 			break
 		}
 		if err != nil {
-			log.Fatalf("Error #70062: unable to process CSV entry: %s, line: %d\n%s\n", csvFile, line, err)
+			log.Printf("Warning #72469: unable to process CSV entry: %s, line: %d\n%s\n", csvFile, line, err)
 		}
 		allCSVEntries = append(allCSVEntries, mailingList.Contact{"", record[2], record[0], record[1]})
 	}
 	return allCSVEntries
 }
-
