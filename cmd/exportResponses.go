@@ -195,5 +195,5 @@ func exportResponses() {
 
 	// extract CSV file from Zip stream and then save it
 	savedCSVFile := extractCSVFileFromZip([]byte(zipFile), exportSurveyName)
-	fmt.Println("Saved CSV file: ", savedCSVFile)
+	fmt.Println("Saved CSV file:", savedCSVFile)
 }
