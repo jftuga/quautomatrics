@@ -4,7 +4,7 @@ Command-line automation of Qualtrics™ surveys
 ### Usage
 
 ```
-Quautomatrics can perform basic operations on Qualtrics™ contacts, mailing lists, and distributions
+Quautomatrics can perform basic operations on Qualtrics™ contacts, mailing lists, distributions, and responses
 
 Usage:
   quautomatrics [command]
@@ -13,6 +13,7 @@ Available Commands:
   createContacts     Add contacts to a mailing list
   createDistribution Create a distribution file in JSON format
   deleteContacts     Remove all contacts from a mailing list
+  exportResponses    Export survey responses in CSV format
   help               Help about any command
   listLibraries      List all libraries. A library is needed in order to create a Distribution.
   listMailingLists   Get a mailing-list ID
@@ -26,6 +27,7 @@ Flags:
   -v, --version         version for quautomatrics
 
 Use "quautomatrics [command] --help" for more information about a command.
+
 
 ```
 
@@ -107,6 +109,14 @@ quautomatrics.exe createDistribution -c quautomatrics_config.json -o distributio
 **Uploading a Distribution**
 ```shell
 quautomatrics.exe uploadDistribution -d distribution.json
+```
+
+**Export Survey Responses to a CSV File**
+```shell
+quautomatrics.exe exportResponses -s My_Fancy_Survey
+[1] waiting for survey export completion...
+[2] waiting for survey export completion...
+Saved CSV file: My_Fancy_Survey.csv
 ```
 
 ### Date-Time Macros
