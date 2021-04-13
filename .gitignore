@@ -22,3 +22,4 @@ dist/
 example*
 atester.bat
 Send-DailyInvitations.ps1
+playground/*
