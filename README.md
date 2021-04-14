@@ -146,6 +146,7 @@ APIs used:
 * [List Contacts](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D~1contacts/get)
 * [Delete Contacts](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D~1contacts~1%7BcontactId%7D/delete)
 * [Create Contacts](https://api.qualtrics.com/instructions/reference/researchCore.json/paths/~1mailinglists~1%7BmailingListId%7D~1contacts/post)
+* [Surveys Response Import/Export API](https://api.qualtrics.com/instructions/reference/responseImportsExports.json)
 
 ### License
 * [MIT License](https://github.com/jftuga/quautomatrics/blob/main/LICENSE)
