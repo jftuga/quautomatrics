@@ -46,7 +46,7 @@ Use "quautomatrics [command] --help" for more information about a command.
 * A `CSV` file must use this format, with no header line:
 * * `first name,last name,email address`
     
-A mailing must already be created through the Qualtrics web interface.
+A survey must already be created through the Qualtrics web interface.
 In the examples below it is called `My_Fancy_Survey`.
 
 **Adding Contacts**
