@@ -1,7 +1,7 @@
 package cmd
 
 const pgmName string = "quautomatrics"
-const pgmVersion string = "1.4.1"
+const pgmVersion string = "1.4.2"
 const pgmURL string = "https://github.com/jftuga/quautomatrics"
 
 // used by createDistribution
